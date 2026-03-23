@@ -1,0 +1,119 @@
+spring:
+  application:
+    name: apigateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          trusted-proxies: ".*"
+
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                allowedMethods: [GET, POST, PUT, DELETE, OPTIONS]
+                allowedHeaders: ["*"]
+                allowCredentials: true
+
+          routes:
+
+            # ── Auth service (9090) — open ──────────────────
+            - id: auth-login
+              uri: http://localhost:9090
+              predicates:
+                - Path=/api/auth/login
+
+            - id: auth-register
+              uri: http://localhost:9090
+              predicates:
+                - Path=/api/auth/register
+
+            - id: auth-logout
+              uri: http://localhost:9090
+              predicates:
+                - Path=/api/auth/logout
+
+            # ── User service (9091) — protected ────────────
+            - id: user-me
+              uri: http://localhost:9091
+              predicates:
+                - Path=/api/user/me
+              filters:
+                - name: JwtAuthFilter
+
+            - id: admin-users
+              uri: http://localhost:9091
+              predicates:
+                - Path=/api/admin/users/**
+              filters:
+                - name: JwtAuthFilter
+
+            # ── Dashboard service (9094) — protected ────────
+            - id: admin-dashboard
+              uri: http://localhost:9094
+              predicates:
+                - Path=/api/admin/dashboard
+              filters:
+                - name: JwtAuthFilter
+
+            - id: user-dashboard
+              uri: http://localhost:9094
+              predicates:
+                - Path=/api/user/dashboard
+              filters:
+                - name: JwtAuthFilter
+
+            # ── Order service (9095) — protected ───────────
+            # /api/orders/** covers POST, GET, GET/{id}, GET/admin/all
+            - id: orders
+              uri: http://localhost:9095
+              predicates:
+                - Path=/api/orders/**
+              filters:
+                - name: JwtAuthFilter
+
+            # ── Payment service (9096) — user-facing only ──
+            # /process and /cancel are internal (service-to-service),
+            # NOT exposed via gateway. Only /my and /admin/all are routed.
+            - id: payment-my
+              uri: http://localhost:9096
+              predicates:
+                - Path=/api/payment/my
+              filters:
+                - name: JwtAuthFilter
+
+            - id: payment-admin
+              uri: http://localhost:9096
+              predicates:
+                - Path=/api/payment/admin/**
+              filters:
+                - name: JwtAuthFilter
+
+            # ── Profile service (9093) ──────────────────────
+            - id: profile-service
+              uri: http://localhost:9093
+              predicates:
+                - Path=/api/profile/**
+
+            # ── OAuth2 service (9092) ───────────────────────
+            - id: oauth2-initiate
+              uri: http://localhost:9092
+              predicates:
+                - Path=/oauth2/**
+
+            - id: oauth2-callback
+              uri: http://localhost:9092
+              predicates:
+                - Path=/login/oauth2/**
+
+server:
+  port: 1013
+
+jwt:
+  secret: ${JWT_SECRET:spantag-super-secret-jwt-key-2026-minimum-32chars}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

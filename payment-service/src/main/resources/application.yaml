@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_db
+    username: postgres
+    password: 12345
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 9096
+  address: 127.0.0.1
+
+logging:
+  level:
+    com.spantag.payment: DEBUG
