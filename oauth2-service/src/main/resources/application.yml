@@ -7,8 +7,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 
-            client-secret: 
+            client-id: 674418730021-hgo0ir08drl3de29bt2t8ppsv4ppkihn.apps.googleusercontent.com
+            client-secret: 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
             scope:
               - email
               - profile
@@ -16,8 +16,8 @@ spring:
             redirect-uri: "http://localhost:9092/login/oauth2/code/google"
 
           github:
-            client-id: 
-            client-secret: 
+            client-id: Ov23liYr5WDyrCLNzBHK
+            client-secret: 75491c0aae2e2c9cf71e45be66a60655359562e2
             scope:
               - user:email
               - read:user
